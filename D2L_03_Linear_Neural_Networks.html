@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>第3章 线性神经网络 - D2L 思维导图</title>
-  <!-- 双源 CSS 保障：优先使用国内/国际均高速可达的 BootCDN / Cloudflare / jsDelivr -->
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,33 +44,39 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       border: 1px solid #e5e7eb;
     }
-    /* 修复移动端 iOS WebKit / Android WebView SVG foreignObject 内 KaTeX 公式溢出裁剪与定位问题 */
-    svg.markmap foreignObject.markmap-foreign {
-      overflow: visible !important;
-    }
     .markmap-foreign > div {
-      overflow: visible !important;
       line-height: 1.45;
     }
     .katex {
       font-size: 1.02em;
-      /* 移动端 WebFont 未加载完成时的优雅数学字体回退 */
       font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
     }
-    html.mm-dark .katex {
+    html.mm-dark .katex,
+    html.mm-dark math {
       color: #f0f6fc;
     }
-    /* 当 KaTeX CSS 因极端网络未加载时，隐藏辅助 MathML 避免公式重影 */
-    .katex-mathml {
-      position: absolute !important;
-      clip: rect(1px, 1px, 1px, 1px) !important;
-      padding: 0 !important;
-      border: 0 !important;
-      height: 1px !important;
-      width: 1px !important;
-      overflow: hidden !important;
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
     }
-    /* 顶部悬浮控制栏，适配手机端窄屏与桌面端 Notion Embed */
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
     .top-bar {
       position: fixed;
       top: 10px;
@@ -242,13 +248,20 @@
 - **训练与推断分离**: `model.train()` 反传更新；`model.eval()` + `torch.no_grad()` 下用 `logits.argmax(dim=1)` 计算测试准确率
   </script>
 
-  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾，确保手机端蜂窝/Wi-Fi 网络下也能 100% 加载） -->
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
   <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
   <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
   <script>
     (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
       const params = new URLSearchParams(window.location.search);
       if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('mm-dark');
@@ -257,7 +270,6 @@
       const { Transformer, Markmap, deriveOptions } = window.markmap;
       const transformer = new Transformer();
 
-      // 直接使用 markmap-lib 原生内置的 markdownItKatex 插件（当 window.katex 已预加载时，它会同步输出 htmlAndMathml 并保留正确的行高）
       const rawMd = document.getElementById('md-source').textContent.trim();
       const { root } = transformer.transform(rawMd);
 
@@ -271,7 +283,6 @@
       const svgEl = document.getElementById('mindmap');
       const mm = Markmap.create(svgEl, options, root);
 
-      // 移动端字体异步加载完成后，自动重新测量节点宽高并刷新布局，防止手机端公式被截断或重叠
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
           mm.setData(root);
