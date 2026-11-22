@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>第3章 线性神经网络 - D2L 思维导图</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <!-- 双源 CSS 保障：优先使用国内/国际均高速可达的 BootCDN / Cloudflare / jsDelivr -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -14,6 +15,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
       background-color: #ffffff;
       color: #1f2328;
+      -webkit-text-size-adjust: 100%;
       transition: background-color 0.25s, color 0.25s;
     }
     html.mm-dark, html.mm-dark body {
@@ -24,6 +26,7 @@
       width: 100%;
       height: 100%;
       display: block;
+      touch-action: none;
     }
     html.mm-dark #mindmap {
       color: #e6edf3;
@@ -41,18 +44,43 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       border: 1px solid #e5e7eb;
     }
-    /* 确保 KaTeX 公式在暗色模式下清晰且不换行截断 */
-    .katex { font-size: 1.02em; }
-    html.mm-dark .katex { color: #f0f6fc; }
-    /* 顶部悬浮控制栏，适配 Notion Embed */
+    /* 修复移动端 iOS WebKit / Android WebView SVG foreignObject 内 KaTeX 公式溢出裁剪与定位问题 */
+    svg.markmap foreignObject.markmap-foreign {
+      overflow: visible !important;
+    }
+    .markmap-foreign > div {
+      overflow: visible !important;
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      /* 移动端 WebFont 未加载完成时的优雅数学字体回退 */
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex {
+      color: #f0f6fc;
+    }
+    /* 当 KaTeX CSS 因极端网络未加载时，隐藏辅助 MathML 避免公式重影 */
+    .katex-mathml {
+      position: absolute !important;
+      clip: rect(1px, 1px, 1px, 1px) !important;
+      padding: 0 !important;
+      border: 0 !important;
+      height: 1px !important;
+      width: 1px !important;
+      overflow: hidden !important;
+    }
+    /* 顶部悬浮控制栏，适配手机端窄屏与桌面端 Notion Embed */
     .top-bar {
       position: fixed;
-      top: 12px;
-      left: 16px;
-      right: 16px;
+      top: 10px;
+      left: 12px;
+      right: 12px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
       pointer-events: none;
       z-index: 100;
     }
@@ -60,53 +88,56 @@
       pointer-events: auto;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
+      gap: 6px;
+      padding: 5px 10px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(0, 0, 0, 0.08);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: #37352f;
       text-decoration: none;
     }
     html.mm-dark .badge {
-      background: rgba(38, 38, 38, 0.88);
+      background: rgba(38, 38, 38, 0.9);
       border-color: rgba(255, 255, 255, 0.12);
       color: #e6edf3;
     }
     .controls {
       pointer-events: auto;
       display: flex;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.88);
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(0, 0, 0, 0.08);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       padding: 4px;
       border-radius: 8px;
     }
     html.mm-dark .controls {
-      background: rgba(38, 38, 38, 0.88);
+      background: rgba(38, 38, 38, 0.9);
       border-color: rgba(255, 255, 255, 0.12);
     }
     .btn {
       border: none;
       background: transparent;
       color: inherit;
-      padding: 5px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
       font-weight: 500;
       transition: background 0.15s;
     }
-    .btn:hover {
+    .btn:hover, .btn:active {
       background: rgba(0, 0, 0, 0.06);
     }
-    html.mm-dark .btn:hover {
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
       background: rgba(255, 255, 255, 0.1);
     }
   </style>
@@ -117,11 +148,10 @@
       <span>🧠 第3章 线性神经网络 (D2L)</span>
     </a>
     <div class="controls">
-      <button class="btn" id="btn-fit" title="居中适配画布">🎯 居中适配</button>
-      <button class="btn" id="btn-expand" title="展开全部节点">📂 全部展开</button>
-      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠章节</button>
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
       <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
-      <button class="btn" id="btn-fullscreen" title="全屏查看">⛶ 全屏</button>
     </div>
   </div>
 
@@ -212,14 +242,13 @@
 - **训练与推断分离**: `model.train()` 反传更新；`model.eval()` + `torch.no_grad()` 下用 `logits.argmax(dim=1)` 计算测试准确率
   </script>
 
-  <!-- 1. 预加载 KaTeX 核心库，确保在 Markmap 计算节点盒子宽高前就完成同步公式渲染 -->
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js"></script>
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾，确保手机端蜂窝/Wi-Fi 网络下也能 100% 加载） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
   <script>
     (function () {
-      // 自动跟随系统或 URL 参数 ?theme=dark 切换明暗模式
       const params = new URLSearchParams(window.location.search);
       if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('mm-dark');
@@ -228,41 +257,28 @@
       const { Transformer, Markmap, deriveOptions } = window.markmap;
       const transformer = new Transformer();
 
-      // 2. 先把 Markdown 中的 $...$ 用 KaTeX 同步预渲染为 HTML 字符串（避免 markmap 动态异步加载导致的源码裸露与宽度截断）
-      function prerenderMathInMarkdown(mdText) {
-        // 保护代码块 `...`，不在反引号内部替换 $
-        const parts = mdText.split(/(`[^`]+`)/g);
-        return parts.map(part => {
-          if (part.startsWith('`') && part.endsWith('`')) return part;
-          return part.replace(/\$([^$\n]+?)\$/g, (match, tex) => {
-            try {
-              return window.katex.renderToString(tex, {
-                throwOnError: false,
-                displayMode: false,
-                output: 'html'
-              });
-            } catch (e) {
-              return match;
-            }
-          });
-        }).join('');
-      }
-
+      // 直接使用 markmap-lib 原生内置的 markdownItKatex 插件（当 window.katex 已预加载时，它会同步输出 htmlAndMathml 并保留正确的行高）
       const rawMd = document.getElementById('md-source').textContent.trim();
-      const renderedMd = prerenderMathInMarkdown(rawMd);
-      const { root } = transformer.transform(renderedMd);
+      const { root } = transformer.transform(rawMd);
 
       const options = deriveOptions({
         colorFreezeLevel: 2,
-        maxWidth: 440,
+        maxWidth: 420,
         initialExpandLevel: 3,
-        duration: 260
+        duration: 250
       });
 
       const svgEl = document.getElementById('mindmap');
       const mm = Markmap.create(svgEl, options, root);
 
-      // 走树递归修改折叠状态
+      // 移动端字体异步加载完成后，自动重新测量节点宽高并刷新布局，防止手机端公式被截断或重叠
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
       function setFoldRecursive(node, maxDepth, currentDepth) {
         if (!node) return;
         node.payload = node.payload || {};
@@ -285,13 +301,6 @@
       });
       document.getElementById('btn-theme').addEventListener('click', () => {
         document.documentElement.classList.toggle('mm-dark');
-      });
-      document.getElementById('btn-fullscreen').addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
       });
     })();
   </script>
