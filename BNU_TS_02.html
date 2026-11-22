@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Time Series Analysis, Lecture 2 - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://app.notion.com/p/41f20c9e79c781e09e98fd649287991e" target="_blank" rel="noopener">
+      <span>🧠 Time Series Analysis, Lecture 2</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# Time Series Analysis, Lecture 2
+
+## Exploratory Examples (ACF)
+- **R Function `acf`**: Computes sample autocorrelations/covariances across lags
+- **AR(2) Example**: $x_t = x_{t-1} - 0.9x_{t-2} + w_t$ exhibits damped oscillatory ACF
+- **MA Example**: $v_t = \frac{1}{3}(w_{t-1} + w_t + w_{t+1})$ cuts off after lag 2
+- **Speech Series**: ACF reveals strong underlying periodicities
+
+## Time Series Regression
+- **Multiple Linear Regression**: $x_t = \beta_0 + \beta_1 z_{t1} + \cdots + \beta_q z_{tq} + w_t = \beta' z_t + w_t$ with $w_t \sim \text{iid } N(0, \sigma_w^2)$
+- **Trend Stationarity**: Series becomes stationary after removing a deterministic trend $\mu_t$
+- **OLS Estimation**: Minimizes $SSE = \sum_{t=1}^n (x_t - \beta' z_t)^2$; normal equations give $\hat{\beta} = (\sum z_t z_t')^{-1} \sum z_t x_t$
+- **Variance & Inference**: $\mathrm{cov}(\hat{\beta}) = \sigma_w^2 C$ where $C = (\sum z_t z_t')^{-1}$; unbiased $\hat{\sigma}_w^2 = MSE = \frac{SSE}{n - (q + 1)}$
+- **t-Test for $\beta_i$**: $TS = \frac{\hat{\beta}_i - \beta_i^0}{s_w \sqrt{c_{ii}}}$ tests individual covariate significance
+
+## Model Selection Criteria
+- **F-Test (Nested Models)**: $TS = \frac{(SSE_r - SSE)/(q - r)}{SSE/(n - q - 1)} \sim F_{q-r, n-q-1}$ tests $H_0: \beta_{r+1} = \cdots = \beta_q = 0$
+- **Coefficient of Determination**: $R^2 = 1 - \frac{SSE}{SSE_0}$ (non-decreasing in $q$); adjusted $R_{adj}^2 = 1 - \frac{(1 - R^2)(n - 1)}{n - q - 1}$
+- **AIC**: $AIC = -2\log L_k + 2k$, or $\log \hat{\sigma}_k^2 + \frac{n + 2k}{n}$ for normal regression
+- **$\text{AIC}_c$ (Small-Sample Corrected)**: $AIC_c = \log \hat{\sigma}_k^2 + \frac{n + k}{n - k - 2}$, reduces overfitting when $n$ is small
+- **BIC (Schwarz Criterion)**: $BIC = -2\log L_k + k\log n$, or $\log \hat{\sigma}_k^2 + \frac{n + k\log n}{n}$; stronger penalty selects smaller models
+
+## Case Study: Cardiovascular Mortality
+- **Variables**: Weekly mortality $M_t$, temperature $T_t$, particulates $P_t$ in Los Angeles County (1970–1980)
+- **Model Comparison**: Adding linear trend, $(T_t - T_\cdot)$, quadratic $(T_t - T_\cdot)^2$, and $P_t$ reduces SSE ($40020 \to 20508$) and AIC/BIC ($5.38 \to 4.72$)
+- **R Workflow**: `lm(cmort ~ trend + temp + temp2 + part)` and `anova(fit1, fit)` for nested F-test
+
+## Modeling Deterministic & Seasonal Trends
+- **Deterministic Trend**: Mean $\mu_t$ modeled via constant, linear, quadratic, or external covariates
+- **Monthly Indicator Model**: $x_t = \mu_t + w_t$ with $\mu_t = \beta_m$ for month $m \in \{1, \dots, 12\}$ (`lm(tempdub ~ month - 1)`)
+- **Sinusoidal Seasonality**: $\mu_t = \beta_0 + A\cos(2\pi\omega t + \phi) = \beta_0 + \beta_1\cos(2\pi\omega t) + \beta_2\sin(2\pi\omega t)$
+- **Parameter Recovery**: $\beta_1 = A\cos\phi$, $\beta_2 = -A\sin\phi \implies A = \sqrt{\beta_1^2 + \beta_2^2}$, $\phi = \arctan(-\beta_2/\beta_1)$
+- **Least-Squares Estimates**: $\hat{\beta}_1 = \frac{2}{n}\sum_{t=1}^n \cos(2\pi\omega t)x_t$, $\hat{\beta}_2 = \frac{2}{n}\sum_{t=1}^n \sin(2\pi\omega t)x_t$
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

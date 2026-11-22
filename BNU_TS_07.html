@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Time Series Analysis, Lecture 7 - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://app.notion.com/p/41f20c9e79c7816899c3c1b8b1ea2d52" target="_blank" rel="noopener">
+      <span>🧠 Time Series Analysis, Lecture 7</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# Time Series Analysis, Lecture 7
+
+## ARMA Forecasting & Backcasting
+- **Infinite-Past Predictor**: For causal/invertible ARMA, $\tilde{x}_{n+m} = \sum_{j=m}^\infty \psi_j w_{n+m-j} = -\sum_{j=1}^{m-1}\pi_j \tilde{x}_{n+m-j} - \sum_{j=m}^\infty \pi_j x_{n+m-j}$
+- **Prediction Error**: $P_{n+m}^n = \sigma_w^2 \sum_{j=0}^{m-1} \psi_j^2$; forecast errors at horizons $m$ and $m+k$ have covariance $\sigma_w^2 \sum_{j=0}^{m-1}\psi_j \psi_{j+k}$
+- **Long-Range Behavior**: As $m \to \infty$, $\tilde{x}_{n+m} \to \mu$ and $P_{n+m}^n \to \gamma_x(0) = \sigma_x^2$ (since causality implies $\psi_j \to 0$ exponentially)
+- **Truncated Predictor**: $\tilde{x}_{n+m}^n = \sum_{i=1}^p \phi_i \tilde{x}_{n+m-i}^n + \sum_{j=1}^q \theta_j \tilde{w}_{n+m-j}^n$ with $\tilde{x}_t^n = 0, \tilde{w}_t^n = 0$ for $t \le 0$ and $\tilde{w}_t^n = 0$ for $t > n$
+- **Forecast Intervals**: Pointwise interval $x_{n+m}^n \pm c_{\alpha/2}\sqrt{P_{n+m}^n}$ (use $c_{\alpha/2} \approx 2$ for 95% Gaussian interval)
+- **Backcasting**: By stationarity, predicting $x_{1-m}^n$ from $\{x_1, \dots, x_n\}$ reverses forecasting: $x_{1-m}^n = \phi_{n1}^{(m)} x_1 + \cdots + \phi_{nn}^{(m)} x_n$
+
+## Parameter Estimation: Method of Moments (MM)
+- **Yule-Walker Equations ($\text{AR}(p)$)**: $\Gamma_p \phi = \gamma_p$ and $\sigma_w^2 = \gamma(0) - \phi'\gamma_p$
+- **Yule-Walker Estimators**: $\hat{\phi} = \hat{\Gamma}_p^{-1}\hat{\gamma}_p = \hat{R}_p^{-1}\hat{\rho}_p$, $\hat{\sigma}_w^2 = \hat{\gamma}(0)(1 - \hat{\rho}_p'\hat{R}_p^{-1}\hat{\rho}_p)$
+- **Asymptotics (Theorem 5.1)**: For causal $\text{AR}(p)$, $\sqrt{n}(\hat{\phi} - \phi) \xrightarrow{d} N(\mathbf{0}, \sigma_w^2 \Gamma_p^{-1})$ and $\hat{\sigma}_w^2 \xrightarrow{p} \sigma_w^2$
+- **Sample PACF Asymptotics (Theorem 5.2)**: When fitting $\text{AR}(m)$ with $m > p$, $\sqrt{n}\hat{\phi}_{mm} \xrightarrow{d} N(0, 1)$
+- **Efficiency**: Yule-Walker is asymptotically optimal for $\text{AR}(p)$, but inefficient for $\text{MA}(q)$ / $\text{ARMA}(p, q)$ (nonlinear in parameters)
+- **MA(1) MM Estimation**: Solve $\hat{\rho}(1) = \frac{\hat{\theta}}{1 + \hat{\theta}^2}$ when $|\hat{\rho}(1)| < \frac{1}{2}$ for invertible $\hat{\theta} = \frac{1 - \sqrt{1 - 4\hat{\rho}(1)^2}}{2\hat{\rho}(1)}$ (higher variance than MLE)
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

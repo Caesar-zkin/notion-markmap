@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第12章 计算性能 (D2L) - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://zh.d2l.ai/chapter_computational-performance/index.html" target="_blank" rel="noopener">
+      <span>🧠 第12章 计算性能 (D2L)</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第12章 计算性能 (D2L)
+
+## 12.1 编译器和解释器
+### 命令式 vs 符号式编程
+- **命令式编程**: 逐句执行并即时更新状态，便于 Python 调试，但频繁调用小算子受调度开销限制
+- **符号式编程**: 先构建完整计算图再编译执行，支持常量折叠、算子重排与中间内存提前回收
+- **混合式编程**: 先以普通 PyTorch 模块开发调试，再用 `torch.jit.script(net)` 编译为可序列化 TorchScript 模块
+
+## 12.2 异步计算
+### 队列提交与同步测量
+- **前后端解耦**: Python 前端将 CUDA 操作提交至队列后立即返回，后端异步执行
+- **精准计时**: 计时前需预热并在前后调用 `torch.cuda.synchronize(device)`；避免频繁调用 `.item()` 打断流水线
+- **排队收益**: 逐次等待耗时 $N(t_1+t_2+t_3)$，批末等待理想耗时 $t_1 + Nt_2 + t_3$（需权衡显存存活张量）
+
+## 12.3 自动并行
+### 跨设备与通信重叠
+- **跨设备并行**: 运行时依据依赖图调度多 GPU 独立任务，理想耗时接近 $\max(T_0, T_1)$
+- **计算通信重叠**: 使用 `.to('cpu', non_blocking=True)` 使结果回传与下一轮计算重叠，读取前需确认同步完成
+
+## 12.4 硬件基础
+### 延迟、带宽与局部性
+- **延迟与带宽**: 延迟指单次操作起止时间，带宽指单位时间传输量；顺序访问与分块提升缓存局部性
+- **伪共享**: 多核心频繁写入同一缓存行内不同地址，触发缓存一致性流量拖慢性能
+### CPU 向量化与 GPU 吞吐
+- **SIMD 带宽需求**: 如 4 核 2GHz 每周期读 256 位向量需 $4\times 256/8 \times 2\text{GHz} = 256\,\mathrm{GB/s}$，高度依赖缓存复用
+- **GPU 特性**: 大量计算单元 + 高带宽显存 + Tensor Core；训练需保留/重算激活，推断可用低精度
+- **设备互连**: PCIe、NVLink 与网络带宽及拓扑决定跨设备通信瓶颈
+
+## 12.5 多 GPU 训练（从零实现）
+### 并行模式与梯度归约
+- **数据并行 vs 模型并行**: 数据并行各卡存完整模型处理不同分片；模型并行将不同层拆分到不同设备
+- **全局批量归约**: 局部梯度和 $\mathbf{g}_j = \sum_{i\in B_j}\nabla_{\mathbf{w}}\ell_i(\mathbf{w})$，全局平均 $\mathbf{g} = \frac{1}{B}\sum_{j=1}^k \mathbf{g}_j$
+- **实现流程**: 广播初始参数 $\to$ `CrossEntropyLoss(reduction="none")` 分别反传 $\to$ 跨卡求和梯度并同步更新
+
+## 12.6 多 GPU 简洁实现
+### PyTorch DataParallel
+- **接口封装**: 将模型放至主卡后用 `nn.DataParallel(net.to(main_device), device_ids=devices)` 包装
+- **前向与反向**: 在批量维度自动切分输入，前向输出汇集到主卡，反向梯度自动累加至原模块参数
+- **扩展性权衡**: 固定全局批量时增加卡数会缩小单卡分片，使通信开销占比上升
+
+## 12.7 参数服务器
+### 环形同步 (Ring AllReduce)
+- **两阶段通信**: 将 $S$ 字节梯度分 $n$ 块，经 $n-1$ 步归约与 $n-1$ 步全交换完成所有卡同步
+- **通信时间模型**: $T \approx 2(n-1)\alpha + \frac{2(n-1)}{n}\frac{S}{\beta}$，忽略延迟 $\alpha$ 时传输时间趋于 $2S/\beta$
+### 多机参数服务器
+- **分层同步**: 先机内 GPU 聚合再跨机传输，降低跨机通信量
+- **分片与键值语义**: 均分参数至 $n$ 个服务器使单机负载降至 $\mathcal{O}(m/n)$；通过 `push` / `pull` 按键求和 $\mathbf{g}_i = \sum_{k,j}\mathbf{g}_{ijk}$
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

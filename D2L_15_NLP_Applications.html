@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第15章 自然语言处理：应用 (D2L) - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://zh.d2l.ai/chapter_natural-language-processing-applications/index.html" target="_blank" rel="noopener">
+      <span>🧠 第15章 自然语言处理：应用 (D2L)</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第15章 自然语言处理：应用 (D2L)
+
+## 15.1 情感分析及数据集
+### IMDb 二分类任务
+- **数据构成**: 训练集与测试集各 $25,000$ 条电影评论，正面标签 $1$、负面标签 $0$，正负各半
+- **预处理**: 按词切分并设 `min_freq=5` 建词表，通过 `d2l.truncate_pad` 统一截断/补齐至 `num_steps=500`
+
+## 15.2 情感分析：循环神经网络 (BiLSTM)
+### 双向编码与首尾拼接
+- **网络结构**: 冻结预训练 $100$ 维 GloVe 嵌入 $\to$ 2 层双向 LSTM（隐藏维 $H=100$）
+- **序列表示**: 拼接首尾时间步隐藏状态 $\mathbf{r} = [\mathbf{h}_1; \mathbf{h}_T] \in \mathbb{R}^{4H}$，经线性层输出二分类 logits
+
+## 15.3 情感分析：卷积神经网络 (textCNN)
+### 一维卷积与最大时间汇聚
+- **通道表示**: 拼接可训练与冻结两份 GloVe 嵌入表，形状转为 `[B, D, T]` 送入 `nn.Conv1d`
+- **多核并行**: 并行使用宽度 $3, 4, 5$ 的一维卷积（各 $100$ 通道）捕捉不同长度 $n$-gram 模式
+- **汇聚分类**: 经 ReLU 与最大时间汇聚 $r_c = \max_t \operatorname{ReLU}(Y_{c,t})$ 得 `[B, 300]`，过 Dropout 后线性分类
+
+## 15.4 自然语言推断 (NLI) 与数据集
+### 句对关系与 SNLI
+- **三类关系**: 给定前提 $P$ 判断假设 $H$：蕴涵（0，可推出）、矛盾（1，互斥）、中性（2，无必然关系）
+- **SNLI 数据**: 超 $50$ 万带标签英语句对，数据迭代器返回 `((premises, hypotheses), labels)`
+
+## 15.5 自然语言推断：可分解注意力
+### Attend - Compare - Aggregate
+- **关注 (Attend)**: 共享 MLP $f$ 计算交叉匹配分数 $e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j)$，双向 softmax 得软对齐摘要 $\boldsymbol{\beta}_i, \boldsymbol{\alpha}_j$
+- **比较 (Compare)**: 共享 MLP $g$ 分别比较原词与对齐摘要：$\mathbf{v}_{A,i} = g([\mathbf{a}_i; \boldsymbol{\beta}_i])$，$\mathbf{v}_{B,j} = g([\mathbf{b}_j; \boldsymbol{\alpha}_j])$
+- **聚合 (Aggregate)**: 两段分别求和得到 $\mathbf{v}_A, \mathbf{v}_B$，拼接后经 MLP $h([\mathbf{v}_A; \mathbf{v}_B])$ 输出三分类 logits
+
+## 15.6 针对下游任务微调 BERT
+### 序列级与词元级任务
+- **序列级任务**: 情感分析、NLI 等取 `<cls>` 位置隐藏表示接任务头，端到端微调编码器
+- **词元级标注**: 命名实体识别等对每个有效词元位置 $\mathbf{h}_i$ 共享线性分类头 $W\mathbf{h}_i + \mathbf{b}$
+- **抽取式问答**: SQuAD 任务用两个独立线性头预测段落起止分数 $s_i, e_i$，推断时在 $i\le j$ 跨度最大化 $s_i+e_j$
+
+## 15.7 自然语言推断：微调 BERT
+### 句对打包与端到端微调
+- **句对打包**: 预留 3 个特殊词元位，若 $|P|+|H| > L_{\max}-3$ 则交替截断较长段，拼为 `<cls> P <sep> H <sep>`
+- **模型复用**: 加载预训练 `bert.small`（$H=256, 4$ 头, $2$ 层），取 `bert.hidden(encoded[:, 0, :])` 接 3 类线性头并用 Adam 微调
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

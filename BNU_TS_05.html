@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Time Series Analysis, Lecture 5 - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://app.notion.com/p/41f20c9e79c781dd9fd8f2252b206f42" target="_blank" rel="noopener">
+      <span>🧠 Time Series Analysis, Lecture 5</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# Time Series Analysis, Lecture 5
+
+## Causality & Invertibility of $\text{ARMA}(p, q)$
+- **Causality (Theorem 3.1)**: With no common factors, $\text{ARMA}(p, q)$ is causal iff $\phi(z) \neq 0$ for $|z| \le 1$; $\psi(z) = \sum_{j=0}^\infty \psi_j z^j = \frac{\theta(z)}{\phi(z)}$
+- **Invertibility (Theorem 3.2)**: With no common factors, $\text{ARMA}(p, q)$ is invertible iff $\theta(z) \neq 0$ for $|z| \le 1$; $\pi(z) = \sum_{j=0}^\infty \pi_j z^j = \frac{\phi(z)}{\theta(z)}$
+- **Coefficient Matching**: Find $\psi_j$ via $\phi(z)\psi(z) = \theta(z)$ and $\pi_j$ via $\theta(z)\pi(z) = \phi(z)$
+- **Infinite AR Representation**: $x_t = -\sum_{j=1}^\infty \pi_j x_{t-j} + w_t$ shows an invertible MA can be approximated by a high-order AR
+- **Example**: $(1 - 0.4B - 0.45B^2)x_t = (1 + B + 0.25B^2)w_t$ cancels $(1 + 0.5B)$ to yield causal, invertible ARMA(1,1)
+
+## Homogeneous Difference Equations
+- **Order-1 Equation**: $u_n - \alpha u_{n-1} = 0 \implies u_n = \alpha^n c = z_0^{-n}c$ where $z_0 = 1/\alpha$ is root of $1 - \alpha z = 0$
+- **Order-2 (Distinct Roots)**: $u_n - \alpha_1 u_{n-1} - \alpha_2 u_{n-2} = 0$ with $z_1 \neq z_2 \implies u_n = c_1 z_1^{-n} + c_2 z_2^{-n}$
+- **Order-2 (Equal Roots)**: When $z_1 = z_2 = z_0 \implies u_n = z_0^{-n}(c_1 + c_2 n)$
+- **General Order-$p$**: Distinct roots $z_j$ with multiplicities $m_j$ ($\sum m_j = p$) give $u_n = \sum_{j=1}^r z_j^{-n} P_j(n)$ ($\deg P_j = m_j - 1$)
+
+## Application to AR(2) ACF
+- **ACF Recursion**: $\rho(k) = \phi_1 \rho(k-1) + \phi_2 \rho(k-2)$ for $k \ge 1$; inverse roots $G_{1,2} = \frac{\phi_1 \mp \sqrt{\phi_1^2 + 4\phi_2}}{2}$
+- **Distinct Real Roots ($G_1 \neq G_2$)**: $\rho(k) = \frac{(1 - G_2^2)G_1^{k+1} - (1 - G_1^2)G_2^{k+1}}{(G_1 - G_2)(1 + G_1 G_2)}$; decays exponentially
+- **Equal Real Roots ($z_1 = z_2 = z_0$)**: $\rho(k) = z_0^{-k}(c_1 + c_2 k)$; decays exponentially
+- **Complex Conjugate Roots ($z_1 = \bar{z}_2$)**: $\rho(k) = a|z_1|^{-k}\cos(h\theta + b)$; damped sinusoidal oscillation
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

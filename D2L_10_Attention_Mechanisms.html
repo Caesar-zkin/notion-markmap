@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第10章 注意力机制 (D2L) - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://zh.d2l.ai/chapter_attention-mechanisms/index.html" target="_blank" rel="noopener">
+      <span>🧠 第10章 注意力机制 (D2L)</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第10章 注意力机制 (D2L)
+
+## 10.1 注意力提示
+### 自主与非自主提示
+- **自主提示**: 来自当前目标的主动选择（如寻找特定书籍），对应查询 $\mathbf{q}$
+- **非自主提示**: 来自外界显著刺激（如醒目颜色），对应键 $\mathbf{k}_i$
+- **注意力汇聚**: 根据查询 $\mathbf{q}$ 与键 $\mathbf{k}_i$ 的交互动态分配权重给值 $\mathbf{v}_i$；均值汇聚为等权重
+- **热图可视化**: 行对应查询、列对应键，如 `torch.eye(10).reshape(1, 1, 10, 10)` 仅对角线匹配
+
+## 10.2 Nadaraya-Watson 核回归
+### 非参数与参数化核回归
+- **核回归公式**: $\hat{y}(x) = \sum_{i=1}^n \alpha_i(x) y_i$，其中权重 $\alpha_i(x) = \frac{K(x-x_i)}{\sum_j K(x-x_j)}$
+- **高斯核形式**: $K(u) = \frac{1}{\sqrt{2\pi}}\exp(-u^2/2)$ 化简为 $\alpha_i(x) = \operatorname{softmax}_i(-\frac{1}{2}(x-x_i)^2)$
+- **可学习核回归**: 评分改为 $-\frac{1}{2}[w(x-x_i)]^2$；$|w|$ 越大越集中于近邻，$w=0$ 退化为平均汇聚
+- **训练细节**: 键值对排除查询自身以防直接读取标签，用 `torch.bmm` 执行批量加权汇聚
+
+## 10.3 注意力评分函数
+### 评分与加性注意力
+- **通用注意力**: $\alpha_i(\mathbf{q}) = \operatorname{softmax}_i(a(\mathbf{q}, \mathbf{k}_i))$，$\operatorname{Attention}(\mathbf{q}, K, V) = \sum_i \alpha_i(\mathbf{q})\mathbf{v}_i$
+- **加性注意力**: $a(\mathbf{q}, \mathbf{k}) = \mathbf{w}_v^\top \tanh(W_q \mathbf{q} + W_k \mathbf{k})$，支持不同输入维度的查询和键
+### 缩放点积与掩蔽
+- **缩放点积**: $a(\mathbf{q}, \mathbf{k}) = \frac{\mathbf{q}^\top \mathbf{k}}{\sqrt{d_k}}$；除 $\sqrt{d_k}$ 使方差保持为 $1$，缓解高维 softmax 饱和
+- **矩阵形式**: $\operatorname{Attention}(Q, K, V) = \operatorname{softmax}_{\text{row}}\!\left(\frac{QK^\top}{\sqrt{d_k}} + M\right)V$
+- **掩码机制**: 加法掩码 $M$ 在可见位置为 $0$、屏蔽位置为 $-\infty$（如填充掩码、因果掩码）
+
+## 10.4 Bahdanau 注意力
+### 动态序列对齐
+- **键值来源**: 编码器所有时刻隐藏状态 $\mathbf{h}_1, \ldots, \mathbf{h}_T$ 同时作为键和值
+- **动态上下文**: 解码时刻 $t$ 用 $\mathbf{s}_{t-1}$ 查询，$\mathbf{c}_t = \sum_i \alpha_{t,i} \mathbf{h}_i$（加性注意力）
+- **解码更新**: 将上一输出词元嵌入与 $\mathbf{c}_t$ 拼接送入 GRU；训练用教师强制，屏蔽源序列填充
+
+## 10.5 多头注意力
+### 并行子空间投影
+- **多头公式**: $H_i = \operatorname{Attention}(QW_i^Q, KW_i^K, VW_i^V)$，$Y = \operatorname{Concat}(H_1, \ldots, H_h)W^O$
+- **张量重排**: 隐藏维度 $d$ 需被头数 $h$ 整除，将 `[B, L, d]` 变形为 `[B, h, L, d/h]` 并行计算
+- **PyTorch 接口**: `nn.MultiheadAttention(embed_dim, num_heads, dropout=..., batch_first=True)`
+
+## 10.6 自注意力和位置编码
+### 自注意力复杂度对比
+- **卷积层**: 每层计算量 $O(knd^2)$，顺序操作 $O(1)$，最长路径 $O(n/k)$
+- **循环层**: 每层计算量 $O(nd^2)$，顺序操作 $O(n)$，最长路径 $O(n)$
+- **自注意力汇聚**: 每层计算量 $O(n^2d)$，顺序操作 $O(1)$，最长路径 $O(1)$（无位置编码时置换等变）
+### 正弦位置编码
+- **编码定义**: $P_{i,2j} = \sin(i\omega_j)$，$P_{i,2j+1} = \cos(i\omega_j)$，其中 $\omega_j = 10000^{-2j/d}$
+- **相对位置性质**: 固定偏移 $\delta$ 的位置编码可表示为与绝对位置 $i$ 无关的 $2\times 2$ 旋转矩阵线性变换
+
+## 10.7 Transformer
+### 编码器与规范化
+- **编码器层**: 多头自注意力 + 基于位置的前馈网络 $\operatorname{FFN}(x) = W_2\operatorname{ReLU}(W_1x+b_1)+b_2$
+- **残差与层规范化**: 后置规范化 $\operatorname{LayerNorm}(X + \operatorname{Dropout}(\operatorname{Sublayer}(X)))$，在特征维统计
+- **嵌入缩放**: 词元嵌入乘以 $\sqrt{d}$ 后再与位置编码相加
+### 解码器与训练推理
+- **三层结构**: 掩蔽多头自注意力（因果掩码 $j \le i$）$\to$ 编码器-解码器交叉注意力 $\to$ FFN
+- **训练与推理**: 训练用右移目标序列并行计算；推理逐步生成并缓存每层历史键值表示
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

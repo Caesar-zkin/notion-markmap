@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第13章 计算机视觉 (D2L) - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://zh.d2l.ai/chapter_computer-vision/index.html" target="_blank" rel="noopener">
+      <span>🧠 第13章 计算机视觉 (D2L)</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第13章 计算机视觉 (D2L)
+
+## 13.1 图像增广
+### 随机变换扩展分布
+- **核心思想**: 保持语义标签不变下生成 $(T(x), y)$，最小化 $\mathbb{E}_{(x,y),T}\ell(f_\theta(T(x)), y)$
+- **常用变换**: `RandomResizedCrop`、水平/垂直翻转、`ColorJitter`（亮度、对比度、饱和度、色调）
+- **任务注意**: 目标检测与语义分割应用空间变换时，边界框与像素掩码必须同步变换
+
+## 13.2 微调 (Fine-Tuning)
+### 迁移学习范式
+- **参数迁移**: 保留源任务（如 ImageNet）预训练特征层作为初值，替换目标分类头并随机初始化
+- **差异化学习率**: 为新输出层设置更大（如 $10\times$）学习率；输入需采用与预训练一致的归一化
+
+## 13.3 目标检测和边界框
+### 坐标表示与转换
+- **两种表示**: 角点式 $(x_{\min}, y_{\min}, x_{\max}, y_{\max})$ 与中心式 $(c_x, c_y, w, h)$（$x$ 向右、$y$ 向下）
+- **转换公式**: $c_x = \frac{x_{\min}+x_{\max}}{2}$，$w = x_{\max}-x_{\min}$；反向 $x_{\min} = c_x - w/2$
+
+## 13.4 锚框 (Anchor Boxes)
+### 生成与 IoU 匹配
+- **候选生成**: 尺寸 $s \in (0,1]$ 与宽高比 $r > 0$ 组合生成 $n+m-1$ 个锚框；像素宽高 $w=sH\sqrt{r}, h=sH/\sqrt{r}$
+- **交并比 (IoU)**: $\operatorname{IoU}(A,B) = \frac{|A\cap B|}{|A|+|B|-|A\cap B|}$
+- **分配策略**: 先将 IoU 超阈值（如 $0.5$）锚框匹配真实框，再按矩阵最大值强制保证每个真实框至少有一匹配
+### 偏移编码与 NMS
+- **标准化偏移**: $t_x = 10\frac{x_g-x_a}{w_a}$，$t_y = 10\frac{y_g-y_a}{h_a}$，$t_w = 5\log\frac{w_g}{w_a}$，$t_h = 5\log\frac{h_g}{h_a}$
+- **非极大值抑制 (NMS)**: 按最高前景分排序，贪心保留最高分框并剔除与其 IoU 超阈值的重叠框
+
+## 13.5 多尺度目标检测
+### 特征图层级分配
+- **尺度分工**: 高分辨率浅层特征图中心密集，检测小目标；低分辨率深层特征图感受野大，检测大目标
+- **锚框总数**: 尺度 $\ell$ 特征图高宽 $H_\ell, W_\ell$、每格 $a_\ell$ 个锚框，总计 $\sum_\ell H_\ell W_\ell a_\ell$，预测头跨位置共享参数
+
+## 13.6 目标检测数据集
+### 香蕉检测与批量处理
+- **标注格式**: CSV 存储图像名、类别与归一化角点坐标；扩展多类时注意仅归一化坐标而非类别编号
+- **批量张量**: 固定单框可堆叠为 `(B, 1, 5)`；变长目标需自定义 `collate_fn` 或掩码填充
+
+## 13.7 单发多框检测 (SSD)
+### 网络结构与损失
+- **多尺度预测头**: 5 个尺度（$32,16,8,4,1$）各用 $3\times 3$ 卷积预测 $a(q+1)$ 分类通道与 $4a$ 回归通道（共 $5444$ 锚框）
+- **联合损失**: $\mathcal{L} = -\frac{1}{A}\sum_i \log p_i(c_i) + \frac{1}{4A}\sum_i m_i \|\hat{\mathbf{t}}_i - \mathbf{t}_i\|_1$（交叉熵 + 掩码 $L_1$ 损失）
+
+## 13.8 R-CNN 系列
+### 演进对比
+- **R-CNN**: 选择性搜索提议区域 $\to$ 缩放后逐个过 CNN $\to$ SVM 分类 + 线性回归边界框
+- **Fast R-CNN**: 整图共享 CNN 特征，用 RoI pooling 提取固定大小区域特征（如 `torchvision.ops.roi_pool`）
+- **Faster R-CNN**: 用区域提议网络（RPN）替代选择性搜索，端到端预测前景性与偏移
+- **Mask R-CNN**: 用 RoIAlign 消除坐标取整量化误差，并行分支预测像素级实例掩码
+
+## 13.9 语义分割和数据集
+### 像素级分类与 Pascal VOC
+- **任务区分**: 语义分割按像素分类（不区分同类别个体）；实例分割进一步区分同类不同个体
+- **VOC 掩码处理**: RGB 颜色编码类别（$256^2R+256G+B$）；图像与掩码需同步随机裁剪，缩放掩码须用最近邻插值
+
+## 13.10 转置卷积
+### 上采样与伴随映射
+- **输出尺寸**: 单轴输入长 $L$、核宽 $k$、步幅 $s$、填充 $p$ 时，输出长度 $L_{\text{out}} = (L-1)s - 2p + k$
+- **转置本质**: 若普通卷积矩阵形式为 $\mathbf{y} = \mathbf{W}\mathbf{x}$，则转置卷积实现伴随映射 $\mathbf{W}^\top \mathbf{u}$
+
+## 13.11 全卷积网络 (FCN)
+### 端到端像素预测
+- **架构改造**: 取预训练 ResNet-18 卷积部分，接 $1\times 1$ 卷积降至 $21$ 通道，再用转置卷积（$s=32, k=64, p=16$）上采样 $32\times$
+- **双线性初始化**: 用双线性插值核初始化对角通道权重，以逐像素交叉熵训练，推断时取 `argmax`
+
+## 13.12 风格迁移
+### 像素优化与三项损失
+- **优化目标**: 固定预训练 VGG-19，直接以合成图像 $X$ 为 `nn.Parameter` 用 Adam 优化像素
+- **内容与风格损失**: 深层特征 MSE 约束内容；归一化 Gram 矩阵 $G(F) = \frac{FF^\top}{CN}$ 刻画通道相关性以约束风格
+- **总变差 (TV) 损失**: 惩罚相邻像素绝对差，抑制合成图像高频噪点
+
+## 13.13 & 13.14 Kaggle 实战 (CIFAR-10 & 狗品种识别)
+### 数据与迁移流程
+- **CIFAR-10**: 用 `ImageFolder` 按目录组织 $32\times 32$ 图像，ResNet-18 + 阶梯学习率调优后合并训练验证集重训
+- **ImageNet Dogs**: 冻结预训练 ResNet-34 提取 $1000$ 维特征，接 $1000\to 256\to 120$ 新分类头，评估多类对数损失 $-\frac{1}{N}\sum_i \log p_i(y_i)$
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第2章 一变量广义线性模型 - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://app.notion.com/p/41f20c9e79c7812b8863e28c9c8bc1b0" target="_blank" rel="noopener">
+      <span>🧠 第2章 一变量广义线性模型</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第2章 一变量广义线性模型
+
+## 2.1 二分类模型与 2.2 性质
+### 三种常用模型
+- **Logit 模型**: $\mathbb{E}(Y|\mathbf{X}) = \frac{\exp(\mathbf{Z}(\mathbf{X})\boldsymbol{\beta}^\top)}{1 + \exp(\mathbf{Z}(\mathbf{X})\boldsymbol{\beta}^\top)}$（对称、优势比简洁）
+- **Probit 模型**: $\mathbb{E}(Y|\mathbf{X}) = \Phi(\mathbf{Z}(\mathbf{X})\boldsymbol{\beta}^\top)$（基于正态潜变量）
+- **Cloglog 模型**: $\mathbb{E}(Y|\mathbf{X}) = 1 - \exp(-\exp(\mathbf{Z}(\mathbf{X})\boldsymbol{\beta}^\top))$（非对称，适合稀有事件）
+### 分布与极大似然估计
+- **条件分布**: $Y \sim B(1, h(\mathbf{Z}(\mathbf{X})\boldsymbol{\beta}^\top))$，条件方差 $h(\eta)(1 - h(\eta))$
+- **对数似然**: $l(\boldsymbol{\beta}) = \sum_{i=1}^n [Y_i \log h(\eta_i) + (1 - Y_i)\log(1 - h(\eta_i))]$
+
+## 2.3 优势 (Odds) 与 2.4 迭代算法
+- **优势与优势比**: $O(\mathbf{x}) = \frac{\mathbb{P}(Y=1|\mathbf{x})}{\mathbb{P}(Y=0|\mathbf{x})}$；Logit 模型中 $O(\mathbf{x}) = \exp(\mathbf{Z}(\mathbf{x})\boldsymbol{\beta}^\top)$，优势比 $\exp((z^{(1)}-z^{(2)})\boldsymbol{\beta}^\top)$
+- **得分函数**: $\mathbf{s}(\boldsymbol{\beta}) = \sum_{i=1}^n \frac{Y_i - h(\eta_i)}{h(\eta_i)(1 - h(\eta_i))}h'(\eta_i)\mathbf{Z}_i$
+- **Fisher 信息矩阵**: $\mathbf{I}(\boldsymbol{\beta}) = \sum_{i=1}^n \frac{(h'(\eta_i))^2}{h(\eta_i)(1 - h(\eta_i))}\mathbf{Z}_i^\top \mathbf{Z}_i$
+- **Fisher 得分迭代**: $\hat{\boldsymbol{\beta}}^{(k+1)} = \hat{\boldsymbol{\beta}}^{(k)} + \mathbf{s}(\hat{\boldsymbol{\beta}}^{(k)})(\mathbf{I}(\hat{\boldsymbol{\beta}}^{(k)}))^{-1}$
+
+## 2.5 假设检验与 2.6 拟合优度
+### 参数假设检验 ($H_0: \mathbf{A}\boldsymbol{\beta}^\top = \mathbf{a}$)
+- **对数似然比检验**: $\lambda = -2(l(\tilde{\boldsymbol{\beta}}) - l(\hat{\boldsymbol{\beta}})) \stackrel{a}{\sim} \chi^2(r)$
+- **Wald 检验**: $W = (\mathbf{A}\hat{\boldsymbol{\beta}}^\top - \mathbf{a})^\top (\mathbf{A}\mathbf{I}(\hat{\boldsymbol{\beta}})^{-1}\mathbf{A}^\top)^{-1}(\mathbf{A}\hat{\boldsymbol{\beta}}^\top - \mathbf{a}) \stackrel{a}{\sim} \chi^2(r)$
+- **得分检验**: $U = \mathbf{s}(\tilde{\boldsymbol{\beta}})\mathbf{I}(\tilde{\boldsymbol{\beta}})^{-1}\mathbf{s}(\tilde{\boldsymbol{\beta}})^\top \stackrel{a}{\sim} \chi^2(r)$
+- **单分量 $z$ 检验**: $T_i = \frac{\hat{\beta}_i}{\sqrt{a_{ii}}} \stackrel{a}{\sim} N(0, 1)$
+### 分组数据拟合优度
+- **皮尔逊统计量**: $\chi^2 = \sum_{k=1}^g \frac{n_k(\bar{Y}_k - h(\mathbf{Z}(\mathbf{v}_k)\hat{\boldsymbol{\beta}}^\top))^2}{h(\dots)(1 - h(\dots))} \stackrel{a}{\sim} \chi^2(g-p)$
+- **偏差统计量 (Deviance)**: $D = -2\sum_{i=1}^g n_i(f_i(h(\mathbf{Z}(\mathbf{v}_i)\hat{\boldsymbol{\beta}}^\top)) - f_i(\bar{Y}_i))$，越小越好
+
+## 2.7 剖腹产感染案例与 2.8 婚外情案例
+- **变量选择与 AIC**: $\text{AIC} = 2p - 2l(\hat{\boldsymbol{\beta}})$，用 `step()` 双向/向前/向后筛选最优设计向量
+- **极端数据与经验样本**: 全 0/全 1 导致标准误爆炸与不收敛，引入先验经验修正后恢复正常
+- **条件边际效应**: 含交互项时不能直接读单系数，需算线性预测子对变量的偏导
+- **离散解释变量**: 有序/多水平离散变量（如宗教信仰）应做哑变量编码并用 `anova(..., test="Chisq")` 检验
+
+## 2.9 模拟研究与 ROC 曲线
+- **阈值预报与误分率**: $\hat{Y}_c = 1_{\{h(\mathbf{Z}\boldsymbol{\beta}) > c\}}$，样本误分率受正负样本比例影响
+- **ROC 曲线 (`pROC::roc`)**: 以 $(FPR, TPR)$ 为坐标，选取最接近 $(0, 1)$ 的点作为最优阈值
+
+## 2.10 非负整数值响应 GLM
+- **Poisson 回归**: `family = poisson`，要求条件期望等于条件方差 $\text{var}(Y|\mathbf{X}) = h(\mathbf{Z}\boldsymbol{\beta}^\top)$
+- **过离散检验**: Pearson 离散度 $\varphi = \frac{1}{n-p}\sum \frac{(Y_i - \hat{\mu}_i)^2}{\hat{\mu}_i}$ 显著大于 1 时存在过离散（如婚外情 $\hat{\varphi}=7.61$）
+- **负二项回归 (`glmmTMB(..., family=nbinom2)`)**: $\text{var}(Y|\mathbf{X}) = \mu(1 + \mu/\theta)$，通过离散参数 $\theta$ 捕捉过离散
+- **零膨胀负二项 (ZINB)**: $Y = \xi \eta$ (`ziformula = ~1`)，同时刻画结构零与过离散
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

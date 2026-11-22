@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>导论：因果推断 - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://app.notion.com/p/41f20c9e79c781a5bc6dc4f311ef34d0" target="_blank" rel="noopener">
+      <span>🧠 导论：因果推断</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 导论：因果推断
+
+## 第一节 因果推断的基本问题
+
+### 1.1 因果关系的思考
+- **两个研究方向**: 由因推果（Effects of Causes，政策效果评估）与由果溯因（Causes of Effects，归因与反事实）
+- **因果效应 / 处理效应**: 干预（treatment）对结果变量产生的影响
+- **Pearl 因果阶梯**: 第一层级关联（观察 $P(Y \mid X)$）、第二层级干预（行动 $P(Y \mid do(X))$）、第三层级反事实（想象与归因）
+
+### 1.2 因果推断的困难
+- **Yule-Simpson 悖论**: 总体趋势与分组趋势相反（如伯克利研究生录取、福特减税、新药效果），源于忽略混杂变量（如专业、收入分布、性别）
+- **解决悖论**: 识别并控制混杂变量，进行分层分析或多元回归调整
+- **异质性因果效应**: 同一干预对不同子群体（如不同年龄、性别）的因果效应存在差异
+
+### 1.3 因果推断简史与实证四问
+- **理论演进**: Neyman (1923) 首次提出潜在结果 → Fisher (1935) 随机化实验 → Rubin (1974) 推广至观测研究形成 RCM → 计量经济学“可信性革命”（Angrist、Imbens、Abadie 等）
+- **随机化实验**: 因果推断黄金标准，使处理组与控制组观测/未观测特征分布一致（如 NSW、STAR 项目）
+- **实证研究四问 (FAQ)**: 感兴趣的因果效应、理想化实验、识别策略（用观测数据近似实验）、统计充分性
+- **根本无法识别的问题 (FUQ)**: 如 $\text{入学年龄} = \text{现有年龄} - \text{在校时间}$，无法同时控制发育与在学影响
+
+## 第二节 Rubin 因果模型（RCM）
+
+### 2.1 三大核心要件
+- **潜在结果 (Potential Outcomes)**: 个体 $i$ 在二值干预 $D_i \in \{0,1\}$ 下分别对应 $Y_{1i}$ 与 $Y_{0i}$
+- **个体因果效应**: $\tau_i = Y_{1i} - Y_{0i}$，仅依赖潜在结果，与观测状态无关
+- **因果推断基本问题 (Holland, 1986)**: 无法同时观测同一物理个体在相同时间下的 $Y_{1i}$ 与 $Y_{0i}$，$Y_i = D_i Y_{1i} + (1 - D_i)Y_{0i}$，需估计反事实结果
+
+### 2.2 稳定性假设（SUTVA）
+- **假设 1（无交互影响）**: 每个个体的潜在结果独立于其他个体的干预状态，无社会互动与一般均衡溢出效应
+- **假设 2（干预同质性）**: 干预水平与质量对所有个体相同
+
+### 2.3 分配机制与非混杂性
+- **分配机制**: 决定哪个潜在结果被观测到的规则，随机实验已知、观测研究未知
+- **非混杂性 / 条件独立性 (CIA)**: $(Y_{0i}, Y_{1i}) \perp D_i \mid X_i$，控制 $X_i$ 后分配近似随机
+
+## 第三节 因果效应的测度
+
+### 3.1 平均因果效应参数
+- **总体平均因果效应 (ATE)**: $ATE \equiv E(Y_{1i} - Y_{0i}) = \frac{N_t}{N}ATT + \frac{N_c}{N}ATC$
+- **干预组平均因果效应 (ATT)**: $ATT \equiv E(Y_{1i} - Y_{0i} \mid D_i = 1)$
+- **控制组平均因果效应 (ATC)**: $ATC \equiv E(Y_{1i} - Y_{0i} \mid D_i = 0)$
+
+### 3.2 OLS 回归系数与选择偏差
+- **二值回归系数**: 简单回归 $Y_i = \beta_0 + \beta_1 D_i + \varepsilon_i$ 的 $\hat{\beta}_1 = \bar{Y}_t - \bar{Y}_c \xrightarrow{p} E[Y_{1i}\mid D_i=1] - E[Y_{0i}\mid D_i=0]$
+- **与 ATT 的偏差分解**: $\beta_1 = ATT + \{E[Y_{0i}\mid D_i=1] - E[Y_{0i}\mid D_i=0]\}$（选择偏差 1）
+- **与 ATC 的偏差分解**: $\beta_1 = ATC + \{E[Y_{1i}\mid D_i=1] - E[Y_{1i}\mid D_i=0]\}$（选择偏差 2）
+- **与 ATE 的偏差分解**: $\beta_1 = ATE + \text{选择偏差 1} + \{1 - \Pr[D_i=1]\}(ATT - ATC)$
+- **识别条件**: 仅当 $E[Y_{0i}\mid D_i=1] = E[Y_{0i}\mid D_i=0]$ 与 $E[Y_{1i}\mid D_i=1] = E[Y_{1i}\mid D_i=0]$ 同时成立时，$\beta_1 = ATE$
+
+## 第四节 因果图（DAG）
+
+### 4.1 有向无环图基本规则
+- **构成要素**: 节点代表随机变量，有向边代表直接因果效应，无循环（无反向因果）
+- **因果与相关**: 完全随机化实验中 $(Y_{1i}, Y_{0i}) \perp D_i$，因果关系等价于相关关系；观测研究中相关未必因果
+
+### 4.2 阻断相关性与后门准则
+- **相关性产生路径**: 直接因果 $D \to Y$、共同原因 $D \leftarrow L \to Y$、以共同结果（对撞变量 $C$）或其后代为条件 $D \to [C] \leftarrow Y$
+- **后门准则 (Backdoor Criteria)**: 以集合 $Z$ 为条件阻断所有 $D$ 与 $Y$ 之间的非因果后门路径，需满足：包含中介路径 $A \to [C] \to B$、包含共同原因 $A \leftarrow [C] \to B$、且不控制共同结果 $C$ 及其后代
+
+### 4.3 两类偏差与处理方法
+- **混杂偏差 (Confounding Bias)**: 由共同原因导致，可通过分层实验、回归控制 $X$、匹配控制 $S$ 阻断后门路径
+- **样本选择偏差 (Sample Selection Bias)**: 由以共同结果（如仅低收入样本、户籍筛选、面板流失）为条件打开非因果路径所致
+- **常用纠正方法**: 调整样本、控制路径上的观测变量、Heckman 两步法（Probit 选择方程 + 逆米尔斯比率 IMR）、倾向得分匹配（PSM，需满足 CIA 与共同支撑假设）
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>

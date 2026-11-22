@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第14章 自然语言处理：预训练 (D2L) - 思维导图</title>
+  <!-- 双源 CSS 保障：桌面端使用 KaTeX HTML + CSS，iOS/iPadOS Safari 使用浏览器原生 MathML 引擎以彻底规避 WebKit foreignObject 坐标飞出 Bug -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" onerror="this.href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background-color: #ffffff;
+      color: #1f2328;
+      -webkit-text-size-adjust: 100%;
+      transition: background-color 0.25s, color 0.25s;
+    }
+    html.mm-dark, html.mm-dark body {
+      background-color: #191919; /* Notion Dark Mode 背景色 */
+      color: #e6edf3;
+    }
+    #mindmap {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+    html.mm-dark #mindmap {
+      color: #e6edf3;
+    }
+    html.mm-dark .markmap-foreign code {
+      background-color: #2d333b;
+      color: #adbac7;
+      border-color: #444c56;
+    }
+    .markmap-foreign code {
+      background-color: #f3f4f6;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 1px solid #e5e7eb;
+    }
+    .markmap-foreign > div {
+      line-height: 1.45;
+    }
+    .katex {
+      font-size: 1.02em;
+      font-family: KaTeX_Main, "Times New Roman", Times, STIXGeneral, "Cambria Math", serif;
+    }
+    html.mm-dark .katex,
+    html.mm-dark math {
+      color: #f0f6fc;
+    }
+    /* 核心修复：iOS / iPadOS / macOS Safari WebKit 内核在经过 D3 transform 的 SVG <foreignObject> 内，
+       会将带 position:relative/absolute (如 KaTeX 的 .vlist-t / .msupsub / .mfrac) 的子节点全部渲染到 SVG 画布左上角 (0,0)！
+       而 Safari / WebKit 原生支持高质量 MathML（不依赖 position:relative/absolute），在 foreignObject 中坐标 100% 跟随节点！ */
+    html.is-webkit .katex-html {
+      display: none !important;
+    }
+    html.is-webkit .katex-mathml {
+      position: static !important;
+      clip: auto !important;
+      clip-path: none !important;
+      width: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: inline !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
+    html.is-webkit .katex-mathml math {
+      display: inline !important;
+      font-size: 1.05em;
+    }
+    /* 顶部悬浮控制栏，适配手机/iPad 端与桌面端 Notion Embed */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .badge {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #37352f;
+      text-decoration: none;
+    }
+    html.mm-dark .badge {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #e6edf3;
+    }
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    html.mm-dark .controls {
+      background: rgba(38, 38, 38, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn {
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn:hover, .btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html.mm-dark .btn:hover, html.mm-dark .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="badge" href="https://zh.d2l.ai/chapter_natural-language-processing-pretraining/index.html" target="_blank" rel="noopener">
+      <span>🧠 第14章 自然语言处理：预训练 (D2L)</span>
+    </a>
+    <div class="controls">
+      <button class="btn" id="btn-fit" title="居中适配画布">🎯 适配</button>
+      <button class="btn" id="btn-expand" title="展开全部节点">📂 全展</button>
+      <button class="btn" id="btn-collapse" title="折叠到二级章节">📁 折叠</button>
+      <button class="btn" id="btn-theme" title="切换明暗主题">🌓 主题</button>
+    </div>
+  </div>
+
+  <svg id="mindmap"></svg>
+
+  <script type="text/template" id="md-source">
+# 第14章 自然语言处理：预训练 (D2L)
+
+## 14.1 词嵌入 (word2vec)
+### 自监督词向量
+- **独热编码局限**: 维数等于词表大小 $V$，任意不同词余弦相似度均为 $0$，无法表达语义远近
+- **跳元模型 (Skip-Gram)**: 由中心词 $w_c$ 预测窗口内上下文词 $w_o$，$p(o\mid c) = \frac{\exp(\mathbf{u}_o^\top \mathbf{v}_c)}{\sum_i \exp(\mathbf{u}_i^\top \mathbf{v}_c)}$
+- **连续词袋 (CBOW)**: 由窗口内上下文平均向量 $\bar{\mathbf{v}} = \frac{1}{m}\sum_{i=1}^m \mathbf{v}_{o_i}$ 预测中心词（忽略词序）
+
+## 14.2 近似训练
+### 降低 Softmax 计算代价
+- **负采样 (NS)**: 将 $O(Vd)$ 多分类转化为二分类，$\ell_{\text{NS}} = -\log\sigma(s(o,c)) - \sum_{k=1}^K \log\sigma(-s(n_k,c))$，复杂度降至 $O((K+1)d)$
+- **层序 Softmax**: 将词置于二叉树叶节点，$p(o\mid c) = \prod_{n\in\text{path}(o)}\sigma(\zeta_n \mathbf{u}_n^\top \mathbf{v}_c)$，路径长 $O(\log V)$（Huffman 树优化高频词）
+
+## 14.3 & 14.4 word2vec 数据集与预训练
+### 采样策略与训练实现
+- **高频下采样**: 按 $P_{\text{discard}}(w) = \max\left(1 - \sqrt{\frac{t}{f(w)}}, 0\right)$ 丢弃高频词（$t=10^{-4}$），平衡词频分布
+- **动态窗口与噪声分布**: 均匀抽取窗口半径，负例按 $f(w)^{0.75}$ 权重抽取并排除真实上下文词
+- **掩码损失**: 用两张 `nn.Embedding(V, d)` 表、`torch.bmm` 与带掩码的 `binary_cross_entropy_with_logits` 忽略填充位
+
+## 14.5 全局向量的词嵌入 (GloVe)
+### 全局共现矩阵分解
+- **加权平方损失**: $L_{\text{GloVe}} = \sum_{i,j:x_{ij}>0} h(x_{ij})(\mathbf{u}_j^\top\mathbf{v}_i + b_i + c_j - \log x_{ij})^2$
+- **权重函数**: $h(x) = \min(1, (x/x_{\max})^\alpha)$（常用 $x_{\max}=100, \alpha=0.75$），抑制低频噪声并对高频封顶
+- **概率比解释**: 向量内积之差 $(\mathbf{u}_j-\mathbf{u}_k)^\top \mathbf{v}_i$ 直接建模共现概率对数比 $\log(p_{ij}/p_{ik})$
+
+## 14.6 子词嵌入
+### fastText 与 BPE
+- **fastText**: 将词拆为 $3\sim 6$ 字符 $n$-gram 及带边界整词，词向量为子词之和 $\mathbf{v}_w = \sum_{g\in\mathcal{G}_w}\mathbf{z}_g$，支持未登录词
+- **字节对编码 (BPE)**: 从字符出发，每步迭代合并语料频率最高的相邻符号对，控制词表大小并学习切分粒度
+
+## 14.7 词的相似性和类比任务
+### 向量空间检索
+- **余弦最近邻**: 归一化预训练向量后，用 $\cos(\mathbf{a},\mathbf{b}) = \frac{\mathbf{a}^\top \mathbf{b}}{\|\mathbf{a}\|_2\|\mathbf{b}\|_2}$ 配合 `torch.topk` 检索语义近邻
+- **类比偏移**: 对 $a:b::c:d$，计算偏移向量 $\mathbf{q} = \mathbf{v}_b - \mathbf{v}_a + \mathbf{v}_c$ 并检索最相似词
+
+## 14.8 BERT 架构
+### 双向编码与输入表示
+- **上下文化表示**: 堆叠 Transformer 编码器通过双向自注意力融合左右上下文，解决一词多义
+- **输入嵌入**: 单句 `<cls> A <sep>` 或句对 `<cls> A <sep> B <sep>`，相加 $\mathbf{x}_i = \mathbf{e}_{\text{token}}(t_i) + \mathbf{e}_{\text{segment}}(s_i) + \mathbf{e}_{\text{pos}}(i)$
+### 双预训练任务
+- **掩蔽语言模型 (MLM)**: 随机选 $15\%$ 位置预测原词（$80\%$ 换 `<mask>`、$10\%$ 随机词、$10\%$ 保持原词）
+- **下一句预测 (NSP)**: 取 `<cls>` 编码经线性层 + `Tanh` 二分类，判断句对是否为真实连续上下句
+
+## 14.9 & 14.10 BERT 数据集与预训练
+### 样本构造与联合训练
+- **数据字段**: 构造 `token_ids`、`segments`、`valid_lens`、`pred_positions`、`mlm_weights`、`mlm_labels`、`nsp_labels`
+- **双任务损失**: $L = \frac{\sum_{b,i}m_{bi}\ell^{\text{MLM}}_{bi}}{\sum_{b,i}m_{bi}+\varepsilon} + \frac{1}{B}\sum_b \ell^{\text{NSP}}_b$，用 Adam 更新并可提取 `<cls>` 或单词元表示
+  </script>
+
+  <!-- 核心库加载（使用 Cloudflare cdnjs + jsDelivr 双源容灾） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js&quot;><\/script>')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" onerror="document.write('<script src=&quot;https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-view@0.17.2/dist/browser/index.js&quot;><\/script>')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js" onerror="document.write('<script src=&quot;https://unpkg.com/markmap-lib@0.17.2/dist/browser/index.iife.js&quot;><\/script>')"></script>
+  <script>
+    (function () {
+      // 检测 iOS / iPadOS / macOS AppleWebKit 内核（包含 Notion App 内置 WKWebView 与 Safari）
+      const ua = navigator.userAgent || '';
+      const isAppleWebKit = /AppleWebKit/i.test(ua) && (!/Chrome|Chromium|Edg|OPR/i.test(ua) || /iPhone|iPad|iPod/i.test(ua));
+      if (isAppleWebKit) {
+        document.documentElement.classList.add('is-webkit');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark' || (!params.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('mm-dark');
+      }
+
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
+      const transformer = new Transformer();
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const { root } = transformer.transform(rawMd);
+
+      const options = deriveOptions({
+        colorFreezeLevel: 2,
+        maxWidth: 420,
+        initialExpandLevel: 3,
+        duration: 250
+      });
+
+      const svgEl = document.getElementById('mindmap');
+      const mm = Markmap.create(svgEl, options, root);
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          mm.setData(root);
+          mm.fit();
+        });
+      }
+
+      function setFoldRecursive(node, maxDepth, currentDepth) {
+        if (!node) return;
+        node.payload = node.payload || {};
+        node.payload.fold = currentDepth >= maxDepth ? 1 : 0;
+        if (node.children) {
+          node.children.forEach(c => setFoldRecursive(c, maxDepth, currentDepth + 1));
+        }
+      }
+
+      document.getElementById('btn-fit').addEventListener('click', () => mm.fit());
+      document.getElementById('btn-expand').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 99, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-collapse').addEventListener('click', () => {
+        setFoldRecursive(mm.state.data, 2, 1);
+        mm.renderData();
+        setTimeout(() => mm.fit(), 280);
+      });
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        document.documentElement.classList.toggle('mm-dark');
+      });
+    })();
+  </script>
+</body>
+</html>
