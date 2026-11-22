@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第3章 线性神经网络 - D2L 思维导图</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.17.2/dist/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -42,6 +41,9 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       border: 1px solid #e5e7eb;
     }
+    /* 确保 KaTeX 公式在暗色模式下清晰且不换行截断 */
+    .katex { font-size: 1.02em; }
+    html.mm-dark .katex { color: #f0f6fc; }
     /* 顶部悬浮控制栏，适配 Notion Embed */
     .top-bar {
       position: fixed;
@@ -210,6 +212,8 @@
 - **训练与推断分离**: `model.train()` 反传更新；`model.eval()` + `torch.no_grad()` 下用 `logits.argmax(dim=1)` 计算测试准确率
   </script>
 
+  <!-- 1. 预加载 KaTeX 核心库，确保在 Markmap 计算节点盒子宽高前就完成同步公式渲染 -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.2/dist/browser/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.2/dist/browser/index.iife.js"></script>
@@ -221,16 +225,36 @@
         document.documentElement.classList.add('mm-dark');
       }
 
-      const { Transformer } = window.markmap;
-      const { Markmap, deriveOptions } = window.markmap;
-
+      const { Transformer, Markmap, deriveOptions } = window.markmap;
       const transformer = new Transformer();
-      const md = document.getElementById('md-source').textContent.trim();
-      const { root, features } = transformer.transform(md);
+
+      // 2. 先把 Markdown 中的 $...$ 用 KaTeX 同步预渲染为 HTML 字符串（避免 markmap 动态异步加载导致的源码裸露与宽度截断）
+      function prerenderMathInMarkdown(mdText) {
+        // 保护代码块 `...`，不在反引号内部替换 $
+        const parts = mdText.split(/(`[^`]+`)/g);
+        return parts.map(part => {
+          if (part.startsWith('`') && part.endsWith('`')) return part;
+          return part.replace(/\$([^$\n]+?)\$/g, (match, tex) => {
+            try {
+              return window.katex.renderToString(tex, {
+                throwOnError: false,
+                displayMode: false,
+                output: 'html'
+              });
+            } catch (e) {
+              return match;
+            }
+          });
+        }).join('');
+      }
+
+      const rawMd = document.getElementById('md-source').textContent.trim();
+      const renderedMd = prerenderMathInMarkdown(rawMd);
+      const { root } = transformer.transform(renderedMd);
 
       const options = deriveOptions({
         colorFreezeLevel: 2,
-        maxWidth: 380,
+        maxWidth: 440,
         initialExpandLevel: 3,
         duration: 260
       });
